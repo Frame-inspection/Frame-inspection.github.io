@@ -275,7 +275,7 @@
     gap: 28px;
     align-items: flex-end;
     justify-content: center;
-    margin-bottom: 36px;
+    margin-bottom: 32px;
   }
   .control-group { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
   .control-group.control-actions { flex-direction: row; align-items: center; gap: 12px; }
@@ -310,52 +310,154 @@
   .seg-btn:disabled { opacity: 0.5; cursor: default; }
   .seg-btn:not(.active):not(:disabled):hover { color: var(--ink); }
 
-  .stage-wrap {
-    background: var(--bg-elevated);
-    border: 1px solid var(--hairline);
-    border-radius: 22px;
+  /* Viewport: mirrors the MuJoCo scene, so it carries the sim's own dark ground. */
+  .sim-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1.62fr) minmax(250px, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .sim-shell { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .viewport {
+    position: relative;
+    background: #08090a;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 18px;
+    overflow: hidden;
     box-shadow: var(--card-shadow);
-    padding: clamp(12px, 3vw, 28px);
   }
   #stage { width: 100%; height: auto; display: block; }
+  .viewport-tag {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    pointer-events: none;
+  }
+
+  .sim-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--hairline);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+  }
+  .panel-title {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-secondary);
+    margin: 0;
+  }
+
+  .phase-list { display: flex; flex-direction: column; gap: 1px; }
+  .phase-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 5px 0;
+    font-size: 13px;
+    color: var(--ink-secondary);
+    transition: color .25s ease;
+  }
+  .phase-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--hairline);
+    flex-shrink: 0;
+    transition: background .25s ease, box-shadow .25s ease, transform .25s ease;
+  }
+  .phase-row.done { color: var(--ink); }
+  .phase-row.done .phase-dot { background: var(--pass); }
+  .phase-row.active { color: var(--ink); font-weight: 600; }
+  .phase-row.active .phase-dot {
+    background: var(--accent);
+    transform: scale(1.3);
+    box-shadow: 0 0 0 4px rgba(10,132,255,0.16);
+  }
+
+  .face-grid { display: flex; flex-direction: column; gap: 7px; }
+  .face-row { display: grid; grid-template-columns: 30px 1fr 38px; align-items: center; gap: 9px; }
+  .face-name {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-secondary);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .face-track {
+    position: relative;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--bg-soft);
+    overflow: hidden;
+  }
+  .face-bar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 50%;
+    border-radius: 3px;
+    background: var(--ink-secondary);
+    transition: width .35s ease, background .35s ease;
+  }
+  .face-bar.is-normal { background: #b9b9bf; }
+  .face-bar.is-anomaly { background: var(--pass); }
+  .face-val {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--ink-secondary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .face-row.observing .face-name { color: var(--accent); }
+  .face-row.flagged .face-name { color: var(--pass); font-weight: 700; }
+
+  .gate-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 14px;
+    border-top: 1px solid var(--hairline);
+    font-size: 13px;
+    color: var(--ink-secondary);
+  }
+  .gate-val {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .gate-val.passed { color: var(--pass); }
+
   .stage-status {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px solid var(--hairline);
+    margin-top: 16px;
     font-size: 14px;
     color: var(--ink-secondary);
   }
-  .tally { display: flex; gap: 18px; font-size: 13px; font-variant-numeric: tabular-nums; }
-  .tally-pass { color: var(--pass); font-weight: 500; }
-  .tally-fail { color: var(--fail); font-weight: 500; }
-  .tally b { font-weight: 700; }
-
-  .rail { stroke: var(--hairline); stroke-width: 3; stroke-linecap: round; }
-  .zone-label { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; text-anchor: middle; }
-  .zone-inspection { fill: rgba(10,132,255,0.08); stroke: var(--accent); stroke-width: 1.5; }
-  .zone-pass { fill: rgba(52,199,89,0.10); stroke: var(--pass); stroke-width: 1.5; }
-  .zone-fail { fill: rgba(255,59,48,0.10); stroke: var(--fail); stroke-width: 1.5; }
-  .arm-caption { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; fill: var(--ink-secondary); text-anchor: middle; }
-
-  .arm-link { stroke: var(--ink); stroke-width: 9; stroke-linecap: round; }
-  .arm-joint { fill: var(--ink); }
-  .laser-tint.arm-link { stroke: var(--accent); }
-  .laser-tint.arm-joint { fill: var(--accent); }
-  .laser-head { fill: var(--accent); }
-  .laser-beam { stroke: var(--accent); stroke-width: 3; stroke-linecap: round; opacity: 0; filter: drop-shadow(0 0 4px var(--accent)); }
-  .claw-finger { stroke: var(--ink); stroke-width: 6; stroke-linecap: round; }
-
-  .object-shape { fill: #d1d1d6; stroke: var(--ink); stroke-width: 2; }
-  .object-hole { fill: var(--bg-elevated); stroke: none; }
-  #objectGroup { transition: opacity .3s ease; }
-
-  @keyframes zoneFlash { 0% { filter: brightness(1); } 35% { filter: brightness(1.45); } 100% { filter: brightness(1); } }
-  .flash { animation: zoneFlash .8s ease; }
+  .status-meta {
+    display: flex;
+    gap: 18px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .status-meta b { color: var(--ink); font-weight: 600; }
 
   /* ---------- Figure ---------- */
   section.figure-section { background: var(--bg); }
@@ -474,98 +576,130 @@
   <div class="wrap wrap--wide">
     <div class="section-head reveal">
       <p class="eyebrow">Interactive Demo</p>
-      <h2>Simulate the inspection cell</h2>
-      <p class="lead" style="max-width:640px;margin:16px auto 0;font-size:clamp(16px,1.8vw,19px);color:var(--ink-secondary);">A simplified walk-through of the dual-arm cell: the gripper reorients and sorts each part, the laser profiler scans it. Pick a part and a task, then run the cycle.</p>
+      <h2>Walk through the inspection policy</h2>
+      <p class="lead" style="max-width:660px;margin:16px auto 0;font-size:clamp(16px,1.8vw,19px);color:var(--ink-secondary);">A top view of the MuJoCo cell. The gripper lifts the part under the fixed overhead camera and reorients it in hand while per-face evidence accumulates. Once the gate fires, the flagged face is placed upward in the red scan region for the laser profiler.</p>
     </div>
 
     <div class="demo-controls reveal">
       <div class="control-group">
-        <span class="control-label">Part</span>
-        <div class="segmented" id="objectPicker" role="radiogroup" aria-label="Select part">
-          <button class="seg-btn active" data-object="bracket" role="radio" aria-checked="true" type="button">Bracket</button>
-          <button class="seg-btn" data-object="gear" role="radio" aria-checked="false" type="button">Gear</button>
-          <button class="seg-btn" data-object="housing" role="radio" aria-checked="false" type="button">Housing</button>
+        <span class="control-label">Anomalous faces</span>
+        <div class="segmented" id="facePicker" role="radiogroup" aria-label="Number of anomalous faces">
+          <button class="seg-btn active" data-faces="1" role="radio" aria-checked="true" type="button">One</button>
+          <button class="seg-btn" data-faces="2" role="radio" aria-checked="false" type="button">Two</button>
         </div>
       </div>
       <div class="control-group">
-        <span class="control-label">Task</span>
-        <div class="segmented" id="taskPicker" role="radiogroup" aria-label="Select task">
-          <button class="seg-btn active" data-task="surface" role="radio" aria-checked="true" type="button">Surface Scan</button>
-          <button class="seg-btn" data-task="dimension" role="radio" aria-checked="false" type="button">Dimensional Check</button>
-          <button class="seg-btn" data-task="fit" role="radio" aria-checked="false" type="button">Fit Verification</button>
+        <span class="control-label">Evidence gate</span>
+        <div class="segmented" id="gatePicker" role="radiogroup" aria-label="Evidence gate threshold">
+          <button class="seg-btn active" data-gate="0.75" role="radio" aria-checked="true" type="button">&tau; = 0.75</button>
+          <button class="seg-btn" data-gate="0.90" role="radio" aria-checked="false" type="button">&tau; = 0.90</button>
         </div>
       </div>
       <div class="control-group control-actions">
-        <button class="btn btn--fill" id="runBtn" type="button">Run Cycle</button>
+        <button class="btn btn--fill" id="runBtn" type="button">Run Episode</button>
         <button class="btn btn--ghost" id="resetBtn" type="button">Reset</button>
       </div>
     </div>
 
-    <div class="stage-wrap reveal">
-      <svg id="stage" viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" aria-label="Dual-arm inspection cell simulation">
-        <rect x="16" y="16" width="868" height="428" rx="20" fill="var(--bg-soft)" stroke="var(--hairline)"></rect>
+    <div class="sim-shell reveal">
+      <div class="viewport">
+        <svg id="stage" viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg" aria-label="Top view of the dual-arm inspection cell">
+          <defs>
+            <pattern id="m6grid" width="26.5" height="26.5" patternUnits="userSpaceOnUse">
+              <circle cx="13.25" cy="13.25" r="1.5" fill="rgba(255,255,255,0.11)"></circle>
+            </pattern>
+            <radialGradient id="camGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.10)"></stop>
+              <stop offset="100%" stop-color="rgba(255,255,255,0)"></stop>
+            </radialGradient>
+            <linearGradient id="linkShade" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f7f7f4"></stop>
+              <stop offset="100%" stop-color="#c9c9c4"></stop>
+            </linearGradient>
+          </defs>
 
-        <line class="rail" x1="130" y1="56" x2="790" y2="56"></line>
-        <line class="rail" x1="430" y1="76" x2="830" y2="76"></line>
-        <text class="arm-caption" x="160" y="42">Gripper</text>
-        <text class="arm-caption" x="800" y="42">Laser Profiler</text>
+          <rect x="0" y="0" width="900" height="700" fill="#0d0e10"></rect>
+          <rect id="tableTop" fill="#141416"></rect>
+          <rect id="tableGrid" fill="url(#m6grid)"></rect>
 
-        <rect id="zonePass" class="zone-pass" x="50" y="200" width="250" height="150" rx="18"></rect>
-        <text class="zone-label" x="175" y="226" fill="var(--pass)">Pass</text>
-
-        <rect id="zoneInspection" class="zone-inspection" x="345" y="200" width="210" height="150" rx="18"></rect>
-        <text class="zone-label" x="450" y="226" fill="var(--accent)">Inspection</text>
-
-        <rect id="zoneFail" class="zone-fail" x="600" y="200" width="250" height="150" rx="18"></rect>
-        <text class="zone-label" x="725" y="226" fill="var(--fail)">Fail</text>
-
-        <g id="objectGroup">
-          <g id="objBracket" class="object-shape">
-            <path d="M -24,-24 H 8 V -6 H 24 V 24 H -24 Z"></path>
+          <circle id="camPool" fill="url(#camGlow)"></circle>
+          <g id="inspectWindow" opacity="0">
+            <rect id="inspectRect" fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="1.2" stroke-dasharray="7 6" rx="6"></rect>
+            <text id="inspectLabel" fill="rgba(255,255,255,0.45)" font-size="10.5" letter-spacing="0.08em" text-anchor="middle" font-family="Geist Mono, ui-monospace, monospace">D435I TOP VIEW</text>
           </g>
-          <g id="objGear" class="object-shape" style="display:none">
-            <circle r="19"></circle>
-            <rect x="-5" y="-27" width="10" height="9" transform="rotate(0)"></rect>
-            <rect x="-5" y="-27" width="10" height="9" transform="rotate(45)"></rect>
-            <rect x="-5" y="-27" width="10" height="9" transform="rotate(90)"></rect>
-            <rect x="-5" y="-27" width="10" height="9" transform="rotate(135)"></rect>
-            <rect x="-5" y="-27" width="10" height="9" transform="rotate(180)"></rect>
-            <rect x="-5" y="-27" width="10" height="9" transform="rotate(225)"></rect>
-            <rect x="-5" y="-27" width="10" height="9" transform="rotate(270)"></rect>
-            <rect x="-5" y="-27" width="10" height="9" transform="rotate(315)"></rect>
-            <circle r="7" class="object-hole"></circle>
-          </g>
-          <g id="objHousing" class="object-shape" style="display:none">
-            <rect x="-26" y="-19" width="52" height="38" rx="10"></rect>
-            <circle r="9" class="object-hole"></circle>
-          </g>
-        </g>
 
-        <g id="gripperArm">
-          <line id="gripLink1" class="arm-link"></line>
-          <line id="gripLink2" class="arm-link"></line>
-          <circle id="gripBase" class="arm-joint" r="9"></circle>
-          <circle id="gripElbow" class="arm-joint" r="7"></circle>
-          <line id="gripFingerA" class="claw-finger"></line>
-          <line id="gripFingerB" class="claw-finger"></line>
-        </g>
+          <g id="zones"></g>
 
-        <g id="laserArm">
-          <line id="laserLink1" class="arm-link laser-tint"></line>
-          <line id="laserLink2" class="arm-link laser-tint"></line>
-          <circle id="laserBase" class="arm-joint laser-tint" r="9"></circle>
-          <circle id="laserElbow" class="arm-joint laser-tint" r="7"></circle>
-          <line id="laserBeam" class="laser-beam"></line>
-          <rect id="laserHead" class="laser-head" x="-11" y="-7" width="22" height="14" rx="3"></rect>
-        </g>
-      </svg>
-      <div class="stage-status">
-        <span id="statusText" aria-live="polite">Ready — press Run Cycle to start.</span>
-        <span class="tally">
-          <span class="tally-pass">Pass <b id="passCount">0</b></span>
-          <span class="tally-fail">Fail <b id="failCount">0</b></span>
-        </span>
+          <g id="laserArm">
+            <line id="l2Link1" class="link" stroke="url(#linkShade)" stroke-width="17" stroke-linecap="round"></line>
+            <line id="l2Link2" class="link" stroke="url(#linkShade)" stroke-width="14" stroke-linecap="round"></line>
+            <circle id="l2Base" fill="#8e8e93" r="15"></circle>
+            <circle id="l2Elbow" fill="#d8d8d4" r="9"></circle>
+            <g id="l2Head">
+              <rect x="-19" y="-13" width="38" height="26" rx="4" fill="#2b2b2e" stroke="#55555a" stroke-width="1.2"></rect>
+              <rect x="-13" y="6" width="26" height="4" rx="1.5" fill="#8b1f1f"></rect>
+            </g>
+            <line id="laserBeam" stroke="#ff2d20" stroke-width="2.4" stroke-linecap="round" opacity="0"></line>
+            <rect id="laserSheet" fill="rgba(255,45,32,0.13)" opacity="0"></rect>
+          </g>
+
+          <g id="cube" opacity="1">
+            <rect id="cubeShadow" fill="rgba(0,0,0,0.55)" rx="3"></rect>
+            <g id="cubeBody">
+              <rect id="cubeSide" fill="#c9551a" rx="3"></rect>
+              <rect id="cubeFace" fill="#e8721f" rx="2"></rect>
+              <rect id="cubeNotch" fill="rgba(0,0,0,0.35)"></rect>
+            </g>
+          </g>
+
+          <g id="gripArm">
+            <line id="g1Link1" class="link" stroke="url(#linkShade)" stroke-width="17" stroke-linecap="round"></line>
+            <line id="g1Link2" class="link" stroke="url(#linkShade)" stroke-width="14" stroke-linecap="round"></line>
+            <circle id="g1Base" fill="#8e8e93" r="15"></circle>
+            <circle id="g1Elbow" fill="#d8d8d4" r="9"></circle>
+            <line id="g1FingerA" stroke="#3a3a3d" stroke-width="7" stroke-linecap="round"></line>
+            <line id="g1FingerB" stroke="#3a3a3d" stroke-width="7" stroke-linecap="round"></line>
+          </g>
+
+          <g id="armLabels">
+            <text id="lblGrip" fill="rgba(255,255,255,0.42)" font-size="10.5" letter-spacing="0.09em" text-anchor="middle" font-family="Geist Mono, ui-monospace, monospace">XARM6 + GRIPPER</text>
+            <text id="lblLaser" fill="rgba(255,255,255,0.42)" font-size="10.5" letter-spacing="0.09em" text-anchor="middle" font-family="Geist Mono, ui-monospace, monospace">XARM6 + LJ-X8200</text>
+          </g>
+        </svg>
+        <span class="viewport-tag">top view &middot; scene_inhand_anomaly.xml</span>
       </div>
+
+      <div class="sim-panel">
+        <div>
+          <p class="panel-title">Pipeline</p>
+          <div class="phase-list" id="phaseList">
+            <div class="phase-row" data-phase="pick"><span class="phase-dot"></span>Pick</div>
+            <div class="phase-row" data-phase="inspect"><span class="phase-dot"></span>Inspect</div>
+            <div class="phase-row" data-phase="localize"><span class="phase-dot"></span>Localize</div>
+            <div class="phase-row" data-phase="orient"><span class="phase-dot"></span>Orient</div>
+            <div class="phase-row" data-phase="place"><span class="phase-dot"></span>Place</div>
+            <div class="phase-row" data-phase="scan"><span class="phase-dot"></span>Profiler scan</div>
+          </div>
+        </div>
+
+        <div>
+          <p class="panel-title">Evidence field</p>
+          <div class="face-grid" id="faceGrid"></div>
+        </div>
+
+        <div class="gate-box">
+          <span>max belief / gate</span>
+          <span class="gate-val" id="gateVal">0.50 / 0.75</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-status">
+      <span id="statusText" aria-live="polite">Ready &mdash; press Run Episode to start.</span>
+      <span class="status-meta">
+        <span>views <b id="viewCount">0</b></span>
+        <span>resolved <b id="resolvedCount">0</b></span>
+      </span>
     </div>
   </div>
 </section>
@@ -710,268 +844,495 @@
 <script>
   (function () {
     var $ = function (id) { return document.getElementById(id); };
+    if (!$('stage')) return;
 
-    var RAIL = {
-      grip:  { y: 56, foldY: 81,  homeX: 160, l1: 130, l2: 130, elbowSign: 1 },
-      laser: { y: 76, foldY: 101, homeX: 800, l1: 110, l2: 110, elbowSign: -1 }
+    /* ---- World → viewport mapping -------------------------------------
+       Coordinates are lifted straight from scene_inhand_anomaly.xml (metres,
+       world frame). The view is the top view rotated 90 deg so the shared
+       +X mounting edge sits at the bottom, matching mid_d435i_color:
+         viewport x  <-  world Y
+         viewport y  <-  world X
+    -------------------------------------------------------------------- */
+    var S = 1060.606;          // px per metre
+    var Y0 = 0.44512;          // world Y at viewport x = 0
+    var X0 = -0.10;            // world X at viewport y = 0
+    var vx = function (worldY) { return (worldY - Y0) * S; };
+    var vy = function (worldX) { return (worldX - X0) * S; };
+    var m = function (metres) { return metres * S; };
+
+    var TABLE = { xMin: -0.5548, xMax: 0.5548, yMin: 0.0596, yMax: 1.7692 };
+    var CUBE_HALF = 0.025;
+    var REGION = { halfX: 0.0375, halfY: 0.0625 };   // world: 75 x 125 mm
+
+    var ZONES = [
+      { id: 'red',   x: 0.1375, y: 0.9019, color: '#ff2d20', label: 'SCAN REGION' },
+      { id: 'dblue', x: 0.0625, y: 0.6019, color: '#2a3ad4', label: '' },
+      { id: 'lblue', x: 0.2150, y: 0.6019, color: '#40ccff', label: '' }
+    ];
+    var HOME_CUBE = { x: 0, y: 0.9144 };
+    var CAM = { x: 0, y: 0.9144 };                   // mid_d435i, 1.0 m above surface
+    // Elbow signs are chosen so each arm folds toward its own outer edge —
+    // the two elbows never overlap, at any pose in the cycle.
+    var ARM = {
+      grip:  { bx: 0.4598, by: 0.6044, L1: 0.293, L2: 0.360, sign:  1 },
+      laser: { bx: 0.4598, by: 1.1994, L1: 0.293, L2: 0.360, sign: -1 }
     };
-    var POINTS = {
-      inspection: { x: 450, y: 275 },
-      pass:       { x: 175, y: 275 },
-      fail:       { x: 725, y: 275 },
-      laserScan:  { x: 450, y: 205 }
+    // Parked poses: folded back near the mounting edge, clear of every zone.
+    var PARK = {
+      grip:  { x: 0.39, y: 0.81 },
+      laser: { x: 0.39, y: 0.99 }
     };
-    var TASKS = {
-      surface:   { label: 'Surface Scan',       passRate: 0.72 },
-      dimension: { label: 'Dimensional Check',   passRate: 0.80 },
-      fit:       { label: 'Fit Verification',    passRate: 0.68 }
-    };
-
-    var state = {
-      object: 'bracket',
-      task: 'surface',
-      running: false,
-      passCount: 0,
-      failCount: 0,
-      grip: { carriageX: RAIL.grip.homeX, tipX: RAIL.grip.homeX, tipY: RAIL.grip.foldY, clawOpen: 1 },
-      laser: { carriageX: RAIL.laser.homeX, tipX: RAIL.laser.homeX, tipY: RAIL.laser.foldY, scanning: false },
-      obj: { x: POINTS.inspection.x, y: POINTS.inspection.y, rot: 0, grabbedBy: null }
-    };
-
-    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-    function lerp(a, b, t) { return a + (b - a) * t; }
-    function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
-
-    function tween(duration, onUpdate) {
-      return new Promise(function (resolve) {
-        var start = performance.now();
-        function frame(now) {
-          var t = clamp((now - start) / duration, 0, 1);
-          onUpdate(easeInOutCubic(t));
-          renderAll();
-          if (t < 1) requestAnimationFrame(frame); else resolve();
-        }
-        requestAnimationFrame(frame);
-      });
-    }
-    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-
-    function solveIK(base, tip, l1, l2, sign) {
-      var dx = tip.x - base.x, dy = tip.y - base.y;
-      var d = Math.hypot(dx, dy);
-      d = clamp(d, Math.abs(l1 - l2) + 0.5, l1 + l2 - 0.5);
-      var D = clamp((d * d - l1 * l1 - l2 * l2) / (2 * l1 * l2), -1, 1);
-      var theta2 = sign * Math.atan2(Math.sqrt(1 - D * D), D);
-      var ang = Math.atan2(dy, dx);
-      var theta1 = ang - Math.atan2(l2 * Math.sin(theta2), l1 + l2 * Math.cos(theta2));
-      var elbow = { x: base.x + l1 * Math.cos(theta1), y: base.y + l1 * Math.sin(theta1) };
-      return elbow;
-    }
-
-    function setLine(elm, p1, p2) {
-      elm.setAttribute('x1', p1.x); elm.setAttribute('y1', p1.y);
-      elm.setAttribute('x2', p2.x); elm.setAttribute('y2', p2.y);
-    }
-    function setCircle(elm, p) { elm.setAttribute('cx', p.x); elm.setAttribute('cy', p.y); }
+    var FACES = ['pz', 'px', 'py', 'nx', 'ny', 'nz'];
+    var FACE_LABEL = { pz: '+Z', px: '+X', py: '+Y', nx: '-X', ny: '-Y', nz: '-Z' };
+    var OBS_GAIN = 0.62;
+    var MIN_VIEWS = 3;
 
     var el = {};
-    ['gripLink1', 'gripLink2', 'gripBase', 'gripElbow', 'gripFingerA', 'gripFingerB',
-     'laserLink1', 'laserLink2', 'laserBase', 'laserElbow', 'laserHead', 'laserBeam',
-     'objectGroup', 'objBracket', 'objGear', 'objHousing',
-     'zonePass', 'zoneFail', 'statusText', 'passCount', 'failCount',
-     'runBtn', 'resetBtn'].forEach(function (id) { el[id] = $(id); });
+    ['tableTop','tableGrid','camPool','inspectWindow','inspectRect','inspectLabel','zones',
+     'g1Link1','g1Link2','g1Base','g1Elbow','g1FingerA','g1FingerB',
+     'l2Link1','l2Link2','l2Base','l2Elbow','l2Head','laserBeam','laserSheet',
+     'cube','cubeShadow','cubeBody','cubeSide','cubeFace','cubeNotch',
+     'lblGrip','lblLaser','faceGrid','phaseList','gateVal',
+     'statusText','viewCount','resolvedCount','runBtn','resetBtn'].forEach(function (id) { el[id] = $(id); });
 
-    if (!el.runBtn) return; // demo section not present
+    var state = {};
 
-    function renderGripper() {
-      var base = { x: state.grip.carriageX, y: RAIL.grip.y };
-      var tip = { x: state.grip.tipX, y: state.grip.tipY };
-      var elbow = solveIK(base, tip, RAIL.grip.l1, RAIL.grip.l2, RAIL.grip.elbowSign);
-      setCircle(el.gripBase, base);
-      setLine(el.gripLink1, base, elbow);
-      setCircle(el.gripElbow, elbow);
-      setLine(el.gripLink2, elbow, tip);
-      var dir = Math.atan2(tip.y - elbow.y, tip.x - elbow.x);
-      var spread = lerp(0.14, 0.55, state.grip.clawOpen);
-      var flen = 20;
-      var fa = { x: tip.x + flen * Math.cos(dir + spread), y: tip.y + flen * Math.sin(dir + spread) };
-      var fb = { x: tip.x + flen * Math.cos(dir - spread), y: tip.y + flen * Math.sin(dir - spread) };
-      setLine(el.gripFingerA, tip, fa);
-      setLine(el.gripFingerB, tip, fb);
-      return tip;
+    function freshState() {
+      return {
+        anomalyFaces: ['px'],
+        gate: 0.75,
+        belief: FACES.reduce(function (o, f) { o[f] = 0.5; return o; }, {}),
+        observed: {},
+        views: 0,
+        roundViews: 0,
+        resolved: [],
+        flagged: null,
+        running: false,
+        cancel: false,
+        cube: { x: HOME_CUBE.x, y: HOME_CUBE.y, rot: 0, lift: 0, upFace: 'pz', held: false },
+        grip:  { tx: PARK.grip.x,  ty: PARK.grip.y,  claw: 1 },
+        laser: { tx: PARK.laser.x, ty: PARK.laser.y, sweep: null }
+      };
     }
 
-    function renderLaser() {
-      var base = { x: state.laser.carriageX, y: RAIL.laser.y };
-      var tip = { x: state.laser.tipX, y: state.laser.tipY };
-      var elbow = solveIK(base, tip, RAIL.laser.l1, RAIL.laser.l2, RAIL.laser.elbowSign);
-      setCircle(el.laserBase, base);
-      setLine(el.laserLink1, base, elbow);
-      setCircle(el.laserElbow, elbow);
-      setLine(el.laserLink2, elbow, tip);
-      el.laserHead.setAttribute('transform', 'translate(' + tip.x + ',' + tip.y + ')');
-      if (state.laser.scanning) {
-        var jitter = (Math.random() - 0.5) * 6;
-        el.laserBeam.setAttribute('x1', tip.x);
-        el.laserBeam.setAttribute('y1', tip.y + 7);
-        el.laserBeam.setAttribute('x2', tip.x + jitter * 0.3);
-        el.laserBeam.setAttribute('y2', state.obj.y - 8 + jitter);
-        el.laserBeam.setAttribute('opacity', 0.85);
+    /* ---- geometry helpers --------------------------------------------- */
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+    function elbowOf(base, tip, L1, L2, sign) {
+      var dx = tip.x - base.x, dy = tip.y - base.y;
+      var d = clamp(Math.hypot(dx, dy), Math.abs(L1 - L2) + 1, L1 + L2 - 1);
+      var D = clamp((d * d - L1 * L1 - L2 * L2) / (2 * L1 * L2), -1, 1);
+      var t2 = sign * Math.atan2(Math.sqrt(1 - D * D), D);
+      var t1 = Math.atan2(dy, dx) - Math.atan2(L2 * Math.sin(t2), L1 + L2 * Math.cos(t2));
+      return { x: base.x + L1 * Math.cos(t1), y: base.y + L1 * Math.sin(t1) };
+    }
+    function line(node, p1, p2) {
+      node.setAttribute('x1', p1.x); node.setAttribute('y1', p1.y);
+      node.setAttribute('x2', p2.x); node.setAttribute('y2', p2.y);
+    }
+    function at(node, p) { node.setAttribute('cx', p.x); node.setAttribute('cy', p.y); }
+
+    /* ---- static scene -------------------------------------------------- */
+    function buildStatic() {
+      var tx = vx(TABLE.yMin), tw = m(TABLE.yMax - TABLE.yMin);
+      var ty = vy(TABLE.xMin), th = m(TABLE.xMax - TABLE.xMin);
+      [el.tableTop, el.tableGrid].forEach(function (r) {
+        r.setAttribute('x', tx); r.setAttribute('y', ty);
+        r.setAttribute('width', tw); r.setAttribute('height', th);
+      });
+
+      at(el.camPool, { x: vx(CAM.y), y: vy(CAM.x) });
+      el.camPool.setAttribute('r', m(0.30));
+
+      var iw = m(0.15);
+      el.inspectRect.setAttribute('x', vx(CAM.y) - iw / 2);
+      el.inspectRect.setAttribute('y', vy(CAM.x) - iw / 2);
+      el.inspectRect.setAttribute('width', iw);
+      el.inspectRect.setAttribute('height', iw);
+      el.inspectLabel.setAttribute('x', vx(CAM.y));
+      el.inspectLabel.setAttribute('y', vy(CAM.x) - iw / 2 - 9);
+
+      var svgNS = 'http://www.w3.org/2000/svg';
+      ZONES.forEach(function (z) {
+        var g = document.createElementNS(svgNS, 'g');
+        var r = document.createElementNS(svgNS, 'rect');
+        // world X spans the viewport's vertical axis, world Y the horizontal one
+        r.setAttribute('x', vx(z.y - REGION.halfY));
+        r.setAttribute('y', vy(z.x - REGION.halfX));
+        r.setAttribute('width', m(REGION.halfY * 2));
+        r.setAttribute('height', m(REGION.halfX * 2));
+        r.setAttribute('fill', 'none');
+        r.setAttribute('stroke', z.color);
+        r.setAttribute('stroke-width', '2.4');
+        r.setAttribute('id', 'zone_' + z.id);
+        g.appendChild(r);
+        if (z.label) {
+          var t = document.createElementNS(svgNS, 'text');
+          t.setAttribute('x', vx(z.y));
+          t.setAttribute('y', vy(z.x - REGION.halfX) - 8);
+          t.setAttribute('fill', z.color);
+          t.setAttribute('font-size', '10.5');
+          t.setAttribute('letter-spacing', '0.09em');
+          t.setAttribute('text-anchor', 'middle');
+          t.setAttribute('font-family', 'Geist Mono, ui-monospace, monospace');
+          t.textContent = z.label;
+          g.appendChild(t);
+        }
+        el.zones.appendChild(g);
+      });
+
+      el.lblGrip.setAttribute('x', vx(ARM.grip.by));
+      el.lblGrip.setAttribute('y', vy(ARM.grip.bx) + 32);
+      el.lblLaser.setAttribute('x', vx(ARM.laser.by));
+      el.lblLaser.setAttribute('y', vy(ARM.laser.bx) + 32);
+
+      // Face rows for the evidence panel
+      FACES.forEach(function (f) {
+        var row = document.createElement('div');
+        row.className = 'face-row';
+        row.id = 'row_' + f;
+        row.innerHTML = '<span class="face-name">' + FACE_LABEL[f] + '</span>' +
+          '<span class="face-track"><span class="face-bar" id="bar_' + f + '"></span></span>' +
+          '<span class="face-val" id="val_' + f + '">0.50</span>';
+        el.faceGrid.appendChild(row);
+      });
+    }
+
+    /* ---- render -------------------------------------------------------- */
+    function renderArm(cfg, tip, nodes) {
+      var base = { x: vx(cfg.by), y: vy(cfg.bx) };
+      var tipPx = { x: vx(tip.ty), y: vy(tip.tx) };
+      var elbow = elbowOf(base, tipPx, m(cfg.L1), m(cfg.L2), cfg.sign);
+      at(nodes.base, base); at(nodes.elbow, elbow);
+      line(nodes.link1, base, elbow);
+      line(nodes.link2, elbow, tipPx);
+      return { tip: tipPx, dir: Math.atan2(tipPx.y - elbow.y, tipPx.x - elbow.x) };
+    }
+
+    function render() {
+      var g = renderArm(ARM.grip, state.grip, {
+        base: el.g1Base, elbow: el.g1Elbow, link1: el.g1Link1, link2: el.g1Link2
+      });
+      var spread = lerp(0.16, 0.52, state.grip.claw);
+      var fl = 21;
+      line(el.g1FingerA, g.tip, {
+        x: g.tip.x + fl * Math.cos(g.dir + spread), y: g.tip.y + fl * Math.sin(g.dir + spread)
+      });
+      line(el.g1FingerB, g.tip, {
+        x: g.tip.x + fl * Math.cos(g.dir - spread), y: g.tip.y + fl * Math.sin(g.dir - spread)
+      });
+
+      var l = renderArm(ARM.laser, state.laser, {
+        base: el.l2Base, elbow: el.l2Elbow, link1: el.l2Link1, link2: el.l2Link2
+      });
+      el.l2Head.setAttribute('transform',
+        'translate(' + l.tip.x + ',' + l.tip.y + ') rotate(' + (l.dir * 180 / Math.PI + 90) + ')');
+
+      if (state.laser.sweep !== null) {
+        var zr = ZONES[0];
+        var sy = lerp(zr.x - REGION.halfX, zr.x + REGION.halfX, state.laser.sweep);
+        el.laserBeam.setAttribute('x1', vx(zr.y - REGION.halfY));
+        el.laserBeam.setAttribute('y1', vy(sy));
+        el.laserBeam.setAttribute('x2', vx(zr.y + REGION.halfY));
+        el.laserBeam.setAttribute('y2', vy(sy));
+        el.laserBeam.setAttribute('opacity', 0.95);
+        el.laserSheet.setAttribute('x', vx(zr.y - REGION.halfY));
+        el.laserSheet.setAttribute('y', vy(zr.x - REGION.halfX));
+        el.laserSheet.setAttribute('width', m(REGION.halfY * 2));
+        el.laserSheet.setAttribute('height', m(REGION.halfX * 2));
+        el.laserSheet.setAttribute('opacity', 1);
       } else {
         el.laserBeam.setAttribute('opacity', 0);
+        el.laserSheet.setAttribute('opacity', 0);
       }
+
+      // Cube. Held aloft it reads larger (nearer the overhead camera) and
+      // throws its shadow off to the side.
+      var c = state.cube;
+      if (c.held) { c.x = state.grip.tx; c.y = state.grip.ty; }
+      var cx = vx(c.y), cy = vy(c.x);
+      var scale = 1 + 0.42 * c.lift;
+      var half = m(CUBE_HALF) * scale;
+      var off = 26 * c.lift;
+
+      el.cubeShadow.setAttribute('x', cx - half + off);
+      el.cubeShadow.setAttribute('y', cy - half + off * 0.55);
+      el.cubeShadow.setAttribute('width', half * 2);
+      el.cubeShadow.setAttribute('height', half * 2);
+      el.cubeShadow.setAttribute('opacity', 0.30 + 0.35 * c.lift);
+
+      el.cubeBody.setAttribute('transform',
+        'translate(' + cx + ',' + cy + ') rotate(' + c.rot + ')');
+      el.cubeSide.setAttribute('x', -half); el.cubeSide.setAttribute('y', -half);
+      el.cubeSide.setAttribute('width', half * 2); el.cubeSide.setAttribute('height', half * 2);
+
+      var inner = half * 0.66;
+      el.cubeFace.setAttribute('x', -inner); el.cubeFace.setAttribute('y', -inner);
+      el.cubeFace.setAttribute('width', inner * 2); el.cubeFace.setAttribute('height', inner * 2);
+      var upIsBad = state.anomalyFaces.indexOf(c.upFace) !== -1;
+      el.cubeFace.setAttribute('fill', upIsBad ? '#0dff26' : '#e8721f');
+
+      el.cubeNotch.setAttribute('x', -half * 0.16);
+      el.cubeNotch.setAttribute('y', -half);
+      el.cubeNotch.setAttribute('width', half * 0.32);
+      el.cubeNotch.setAttribute('height', half * 0.26);
+
+      el.inspectWindow.setAttribute('opacity', c.lift);
     }
 
-    function renderObject() {
-      el.objectGroup.setAttribute('transform', 'translate(' + state.obj.x + ',' + state.obj.y + ') rotate(' + state.obj.rot + ')');
-      el.objBracket.style.display = state.object === 'bracket' ? '' : 'none';
-      el.objGear.style.display = state.object === 'gear' ? '' : 'none';
-      el.objHousing.style.display = state.object === 'housing' ? '' : 'none';
+    /* ---- panel --------------------------------------------------------- */
+    function renderPanel() {
+      FACES.forEach(function (f) {
+        var b = state.belief[f];
+        var bar = $('bar_' + f), val = $('val_' + f), row = $('row_' + f);
+        bar.style.width = (b * 100).toFixed(1) + '%';
+        val.textContent = b.toFixed(2);
+        bar.className = 'face-bar' + (b >= state.gate ? ' is-anomaly' : (b < 0.4 ? ' is-normal' : ''));
+        row.classList.toggle('flagged', state.flagged === f);
+      });
+      var mx = maxBelief();
+      el.gateVal.textContent = mx.toFixed(2) + ' / ' + state.gate.toFixed(2);
+      el.gateVal.classList.toggle('passed', mx >= state.gate);
+      el.viewCount.textContent = state.views;
+      el.resolvedCount.textContent = state.resolved.length;
     }
 
-    function renderAll() {
-      var gripTip = renderGripper();
-      renderLaser();
-      if (state.obj.grabbedBy === 'grip') { state.obj.x = gripTip.x; state.obj.y = gripTip.y; }
-      renderObject();
+    function setPhase(name) {
+      var order = ['pick', 'inspect', 'localize', 'orient', 'place', 'scan'];
+      var idx = order.indexOf(name);
+      el.phaseList.querySelectorAll('.phase-row').forEach(function (row) {
+        var i = order.indexOf(row.dataset.phase);
+        row.classList.toggle('active', i === idx);
+        row.classList.toggle('done', idx >= 0 && i < idx);
+      });
+    }
+    function clearPhases() {
+      el.phaseList.querySelectorAll('.phase-row').forEach(function (row) {
+        row.classList.remove('active', 'done');
+      });
+    }
+    function say(t) { el.statusText.textContent = t; }
+
+    /* ---- animation ----------------------------------------------------- */
+    function tween(ms, fn) {
+      return new Promise(function (resolve) {
+        var t0 = performance.now();
+        (function step(now) {
+          if (state.cancel) { resolve(); return; }
+          var t = clamp((now - t0) / ms, 0, 1);
+          fn(ease(t), t);
+          render();
+          if (t < 1) requestAnimationFrame(step); else resolve();
+        })(t0);
+      });
+    }
+    function hold(ms) {
+      return new Promise(function (r) { setTimeout(r, ms); });
+    }
+    function moveArm(which, to, ms) {
+      var a = state[which];
+      var f = { tx: a.tx, ty: a.ty };
+      return tween(ms, function (t) {
+        a.tx = lerp(f.tx, to.x, t);
+        a.ty = lerp(f.ty, to.y, t);
+      });
+    }
+    function claw(to, ms) {
+      var f = state.grip.claw;
+      return tween(ms, function (t) { state.grip.claw = lerp(f, to, t); });
+    }
+    function liftTo(to, ms) {
+      var f = state.cube.lift;
+      return tween(ms, function (t) { state.cube.lift = lerp(f, to, t); });
+    }
+    function spinTo(deg, face, ms) {
+      var f = state.cube.rot;
+      return tween(ms, function (t, raw) {
+        state.cube.rot = lerp(f, deg, t);
+        if (raw > 0.55) state.cube.upFace = face;
+      });
     }
 
-    function setStatus(text) { el.statusText.textContent = text; }
-
-    function moveGripCarriage(toX, duration) {
-      var from = state.grip.carriageX;
-      return tween(duration, function (t) { state.grip.carriageX = lerp(from, toX, t); state.grip.tipX = state.grip.carriageX; });
+    /* ---- policy --------------------------------------------------------
+       A face already scanned in an earlier cycle leaves the candidate set, so
+       its settled belief can neither trip the gate nor win the argmax again.
+    --------------------------------------------------------------------- */
+    function candidates() {
+      return FACES.filter(function (f) { return state.resolved.indexOf(f) === -1; });
     }
-    function moveGripTipY(toY, duration) {
-      var from = state.grip.tipY;
-      return tween(duration, function (t) { state.grip.tipY = lerp(from, toY, t); });
+    function nextView() {
+      // Greedy next-best-view: least certain face first, unobserved faces win ties.
+      var best = null, bestKey = Infinity;
+      candidates().forEach(function (f) {
+        var certainty = Math.abs(state.belief[f] - 0.5);
+        var key = (state.observed[f] ? 1 : 0) * 10 + certainty;
+        if (key < bestKey) { bestKey = key; best = f; }
+      });
+      return best;
     }
-    function setClaw(toOpen, duration) {
-      var from = state.grip.clawOpen;
-      return tween(duration, function (t) { state.grip.clawOpen = lerp(from, toOpen, t); });
+    function observe(face) {
+      var truth = state.anomalyFaces.indexOf(face) !== -1 ? 1 : 0;
+      state.belief[face] += (truth - state.belief[face]) * OBS_GAIN;
+      state.observed[face] = (state.observed[face] || 0) + 1;
+      state.views++;
+      state.roundViews++;
+      var row = $('row_' + face);
+      row.classList.add('observing');
+      setTimeout(function () { row.classList.remove('observing'); }, 420);
+      renderPanel();
     }
-    function moveLaserCarriage(toX, duration) {
-      var from = state.laser.carriageX;
-      return tween(duration, function (t) { state.laser.carriageX = lerp(from, toX, t); state.laser.tipX = state.laser.carriageX; });
+    function maxBelief() {
+      var c = candidates();
+      return c.length ? Math.max.apply(null, c.map(function (f) { return state.belief[f]; })) : 0;
     }
-    function moveLaserTipY(toY, duration) {
-      var from = state.laser.tipY;
-      return tween(duration, function (t) { state.laser.tipY = lerp(from, toY, t); });
+    function gatePassed() {
+      return state.roundViews >= MIN_VIEWS && maxBelief() >= state.gate;
     }
-    function rotateObject(byDeg, duration) {
-      var from = state.obj.rot;
-      return tween(duration, function (t) { state.obj.rot = from + byDeg * t; });
-    }
-    function fadeObject(from, to, duration) {
-      return tween(duration, function (t) { el.objectGroup.style.opacity = lerp(from, to, t); });
-    }
-
-    function flashZone(zoneEl) {
-      zoneEl.classList.remove('flash');
-      void zoneEl.getBoundingClientRect();
-      zoneEl.classList.add('flash');
-    }
-
-    function setControlsDisabled(disabled) {
-      document.querySelectorAll('#objectPicker .seg-btn, #taskPicker .seg-btn').forEach(function (b) { b.disabled = disabled; });
-      el.runBtn.disabled = disabled;
+    function argmaxFace() {
+      return candidates().reduce(function (a, b) { return state.belief[b] > state.belief[a] ? b : a; });
     }
 
-    async function runCycle() {
+    /* ---- episode ------------------------------------------------------- */
+    async function oneFace(round) {
+      var pick = { x: state.cube.x, y: state.cube.y };
+
+      setPhase('pick');
+      say(round === 0 ? 'Approaching the part…' : 'Re-grasping for the next face…');
+      await moveArm('grip', pick, 900);
+      await claw(0.14, 300);
+      state.cube.held = true;
+
+      setPhase('inspect');
+      say('Lifting into the overhead camera view…');
+      await moveArm('grip', CAM, 800);
+      await liftTo(1, 550);
+
+      // Reorient in hand, accumulating per-face evidence until the gate fires.
+      var angle = state.cube.rot;
+      var guard = 0;
+      while (!gatePassed() && guard < 9) {
+        var face = nextView();
+        angle += 62;
+        say('Reorienting — observing face ' + FACE_LABEL[face] + '…');
+        await spinTo(angle, face, 520);
+        observe(face);
+        await hold(140);
+        guard++;
+      }
+
+      setPhase('localize');
+      state.flagged = argmaxFace();
+      renderPanel();
+      say('Gate fired — anomaly localized on face ' + FACE_LABEL[state.flagged] + '.');
+      await hold(900);
+
+      setPhase('orient');
+      say('Orienting face ' + FACE_LABEL[state.flagged] + ' upward…');
+      await spinTo(angle + 128, state.flagged, 800);
+
+      setPhase('place');
+      say('Placing into the red scan region…');
+      await moveArm('grip', { x: ZONES[0].x, y: ZONES[0].y }, 950);
+      await liftTo(0, 520);
+      state.cube.held = false;
+      await claw(1, 280);
+      await moveArm('grip', PARK.grip, 850);
+
+      setPhase('scan');
+      say('Laser profiler sweeping the exposed face…');
+      await moveArm('laser', { x: ZONES[0].x - 0.10, y: ZONES[0].y }, 850);
+      state.laser.sweep = 0;
+      await tween(1500, function (t) { state.laser.sweep = t; });
+      state.laser.sweep = null;
+      render();
+      await moveArm('laser', PARK.laser, 800);
+
+      state.resolved.push(state.flagged);
+      renderPanel();
+    }
+
+    async function run() {
       if (state.running) return;
-      state.running = true;
-      setControlsDisabled(true);
+      state.running = true; state.cancel = false;
+      setControls(true);
 
-      setStatus('Picking up part…');
-      await moveGripCarriage(POINTS.inspection.x, 700);
-      await moveGripTipY(POINTS.inspection.y, 500);
-      state.obj.grabbedBy = 'grip';
-      await setClaw(0.12, 280);
+      for (var i = 0; i < state.anomalyFaces.length; i++) {
+        if (state.cancel) break;
+        if (i > 0) {
+          // Second anomalous face: reset the belief over the unresolved faces.
+          FACES.forEach(function (f) {
+            state.belief[f] = state.resolved.indexOf(f) === -1 ? 0.5 : 0;
+          });
+          state.observed = {}; state.flagged = null; state.roundViews = 0;
+          renderPanel();
+          say('Another face is still flagged — repeating the cycle.');
+          await hold(800);
+        }
+        await oneFace(i);
+      }
 
-      setStatus('Reorienting part…');
-      await rotateObject(170, 750);
-
-      setStatus('Placing part for inspection…');
-      await setClaw(1, 250);
-      state.obj.grabbedBy = null;
-      await moveGripTipY(RAIL.grip.foldY, 400);
-      await moveGripCarriage(RAIL.grip.homeX, 700);
-
-      var task = TASKS[state.task];
-      setStatus('Scanning surface — ' + task.label + '…');
-      await moveLaserCarriage(POINTS.laserScan.x, 600);
-      await moveLaserTipY(POINTS.laserScan.y, 400);
-      state.laser.scanning = true;
-      await tween(1400, function () {});
-      state.laser.scanning = false;
-      await moveLaserTipY(RAIL.laser.foldY, 400);
-      await moveLaserCarriage(RAIL.laser.homeX, 600);
-
-      var passed = Math.random() < task.passRate;
-
-      setStatus(passed ? 'No defect found — routing to Pass' : 'Defect detected — routing to Fail');
-      await moveGripCarriage(POINTS.inspection.x, 700);
-      await moveGripTipY(POINTS.inspection.y, 500);
-      state.obj.grabbedBy = 'grip';
-      await setClaw(0.12, 280);
-      await moveGripTipY(RAIL.grip.foldY, 400);
-      var target = passed ? POINTS.pass : POINTS.fail;
-      await moveGripCarriage(target.x, 700);
-      await moveGripTipY(target.y, 500);
-      await setClaw(1, 250);
-      state.obj.grabbedBy = null;
-      flashZone(passed ? el.zonePass : el.zoneFail);
-      await moveGripTipY(RAIL.grip.foldY, 400);
-      await moveGripCarriage(RAIL.grip.homeX, 700);
-
-      if (passed) { state.passCount++; el.passCount.textContent = state.passCount; }
-      else { state.failCount++; el.failCount.textContent = state.failCount; }
-
-      await wait(700);
-      await fadeObject(1, 0, 400);
-      state.obj.x = POINTS.inspection.x; state.obj.y = POINTS.inspection.y; state.obj.rot = 0;
-      renderObject();
-      await fadeObject(0, 1, 300);
-
-      setStatus('Ready — press Run Cycle to start.');
-      setControlsDisabled(false);
+      if (!state.cancel) {
+        clearPhases();
+        el.phaseList.querySelectorAll('.phase-row').forEach(function (r) { r.classList.add('done'); });
+        say('Episode complete — ' + state.resolved.length + ' anomalous face' +
+            (state.resolved.length > 1 ? 's' : '') + ' scanned face-up in the red region.');
+      }
       state.running = false;
+      setControls(false);
     }
 
-    function resetAll() {
-      state.running = false;
-      state.grip.carriageX = RAIL.grip.homeX; state.grip.tipX = RAIL.grip.homeX; state.grip.tipY = RAIL.grip.foldY; state.grip.clawOpen = 1;
-      state.laser.carriageX = RAIL.laser.homeX; state.laser.tipX = RAIL.laser.homeX; state.laser.tipY = RAIL.laser.foldY; state.laser.scanning = false;
-      state.obj.x = POINTS.inspection.x; state.obj.y = POINTS.inspection.y; state.obj.rot = 0; state.obj.grabbedBy = null;
-      el.objectGroup.style.opacity = 1;
-      state.passCount = 0; state.failCount = 0;
-      el.passCount.textContent = '0'; el.failCount.textContent = '0';
-      setStatus('Ready — press Run Cycle to start.');
-      setControlsDisabled(false);
-      renderAll();
+    function setControls(busy) {
+      document.querySelectorAll('#facePicker .seg-btn, #gatePicker .seg-btn')
+        .forEach(function (b) { b.disabled = busy; });
+      el.runBtn.disabled = busy;
     }
 
-    document.querySelectorAll('#objectPicker .seg-btn').forEach(function (btn) {
+    function reset(keepChoices) {
+      state.cancel = true;
+      var faces = keepChoices ? state.anomalyFaces : ['px'];
+      var gate = keepChoices ? state.gate : 0.75;
+      state = freshState();
+      state.anomalyFaces = faces;
+      state.gate = gate;
+      clearPhases();
+      renderPanel();
+      render();
+      say('Ready — press Run Episode to start.');
+      setControls(false);
+    }
+
+    /* ---- controls ------------------------------------------------------ */
+    document.querySelectorAll('#facePicker .seg-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (state.running) return;
-        document.querySelectorAll('#objectPicker .seg-btn').forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-checked', 'false'); });
+        document.querySelectorAll('#facePicker .seg-btn').forEach(function (b) {
+          b.classList.remove('active'); b.setAttribute('aria-checked', 'false');
+        });
         btn.classList.add('active'); btn.setAttribute('aria-checked', 'true');
-        state.object = btn.dataset.object;
-        renderObject();
+        var n = parseInt(btn.dataset.faces, 10);
+        state.anomalyFaces = n === 2 ? ['px', 'ny'] : ['px'];
+        reset(true);
       });
     });
-    document.querySelectorAll('#taskPicker .seg-btn').forEach(function (btn) {
+    document.querySelectorAll('#gatePicker .seg-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (state.running) return;
-        document.querySelectorAll('#taskPicker .seg-btn').forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-checked', 'false'); });
+        document.querySelectorAll('#gatePicker .seg-btn').forEach(function (b) {
+          b.classList.remove('active'); b.setAttribute('aria-checked', 'false');
+        });
         btn.classList.add('active'); btn.setAttribute('aria-checked', 'true');
-        state.task = btn.dataset.task;
+        state.gate = parseFloat(btn.dataset.gate);
+        reset(true);
       });
     });
+    el.runBtn.addEventListener('click', function () { state.cancel = false; run(); });
+    el.resetBtn.addEventListener('click', function () { reset(true); });
 
-    el.runBtn.addEventListener('click', runCycle);
-    el.resetBtn.addEventListener('click', resetAll);
-
-    renderAll();
+    state = freshState();
+    buildStatic();
+    renderPanel();
+    render();
   })();
 </script>
