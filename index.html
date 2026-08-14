@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Task-Specified Active Metrological Inspection — Paper</title>
 <link rel="icon" type="image/png" href="Assets/icon-small.png">
 <style>
@@ -32,7 +35,6 @@
     --code-accent: #7dd0ff;
     --pass: #34c759;
     --fail: #ff3b30;
-    --figure-inset: clamp(14px, 3vw, 32px);
   }
 
   * { box-sizing: border-box; }
@@ -141,11 +143,20 @@
   }
   p.affil {
     font-size: 15px;
+    line-height: 1.6;
     color: var(--ink-secondary);
     margin: 0 0 44px;
     opacity: 0;
     animation: rise .8s ease-out .3s forwards;
   }
+  /* Keep the affiliation markers from stretching the author line's leading. */
+  p.authors sup, p.affil sup {
+    font-size: 0.62em;
+    line-height: 0;
+    vertical-align: super;
+    margin-left: 1px;
+  }
+  p.affil sup { margin: 0 2px 0 0; }
   .cta-row {
     display: flex;
     gap: 14px;
@@ -241,30 +252,44 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* ---------- Figure ---------- */
-  section.figure-section { background: var(--bg); }
-  /* Browsers give <figure> a 40px side margin by default; set the width here
-     instead so the caption can be lined up with the image below. */
-  section.figure-section figure { max-width: 860px; margin: 0 auto; }
-  .figure-card {
+  /* ---------- Story sections (Why it matters / Method overview) ---------- */
+  /* Both are the same shape: a framed figure, then a heading and one
+     paragraph under it, so they share every rule below. */
+  section.why-section,
+  section.method-section { background: var(--bg); }
+
+  .section-figure {
+    max-width: 796px;
+    margin: 0 auto;
     background: var(--bg-elevated);
     border: 1px solid var(--hairline);
     border-radius: 22px;
+    overflow: hidden;
     box-shadow: var(--card-shadow);
-    padding: 26px var(--figure-inset);
   }
-  .figure-card svg,
-  .figure-card img { width: 100%; height: auto; display: block; }
-  figcaption {
-    margin-top: 18px;
-    /* Card inset plus its 1px border, so the text runs exactly the width of
-       the image above it. */
-    padding: 0 calc(var(--figure-inset) + 1px);
-    font-size: 14px;
+  /* introduction.png is black edge to edge, so its frame is black as well and
+     the image reaches the rounded corners instead of floating on white. */
+  .section-figure--dark { background: #000; }
+  .section-figure img { width: 100%; height: auto; display: block; }
+
+  .section-body {
+    max-width: 760px;
+    margin: 36px auto 0;
+  }
+  .section-body h2 {
+    font-size: clamp(21px, 2.4vw, 27px);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0 0 14px;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .section-body p {
+    margin: 0;
+    font-size: 16.5px;
+    line-height: 1.72;
     color: var(--ink-secondary);
-    text-align: left;
   }
-  figcaption b { color: var(--ink); font-weight: 600; }
 
   /* ---------- Citation ---------- */
   section.cite-section { background: var(--bg); }
@@ -321,7 +346,8 @@
     <div class="links">
       <a href="#hero">Overview</a>
       <a href="#video">Video</a>
-      <a href="#figure">Figure</a>
+      <a href="#why">Why</a>
+      <a href="#method">Method</a>
       <a href="#cite">Citation</a>
     </div>
   </div>
@@ -330,8 +356,11 @@
 <header class="hero" id="hero">
   <p class="eyebrow">Research Paper</p>
   <h1 class="title">Task-Specified Active Metrological Inspection with Measurement-Steered VLA Manipulation and Deterministic Evidence Gating</h1>
-  <p class="authors">Zhiling Chen · Jingzhan Ge · Farhad Imani</p>
-  <p class="affil">School of Mechanical, Aerospace, and Manufacturing Engineering · University of Connecticut</p>
+  <p class="authors">Zhiling Chen<sup>1</sup> · Jingzhan Ge<sup>1</sup> · Ruimin Chen<sup>1</sup> · Matthew P. Castanier<sup>2</sup> · David Gorsich<sup>2</sup> · Farhad Imani<sup>1</sup></p>
+  <p class="affil">
+    <sup>1</sup>School of Mechanical, Aerospace, and Manufacturing Engineering, University of Connecticut<br>
+    <sup>2</sup>US Army DEVCOM Ground Vehicle Systems Center
+  </p>
   <div class="cta-row">
     <a class="btn btn--fill" href="#video">Watch the film</a>
     <a class="btn btn--ghost" href="#">
@@ -360,19 +389,35 @@
   </div>
 </section>
 
-<section class="figure-section" id="figure">
+<section class="why-section" id="why">
   <div class="wrap">
     <div class="section-head reveal">
-      <p class="eyebrow">Overview</p>
-      <h2>Method Overview</h2>
+      <p class="eyebrow">Why it matters</p>
     </div>
-    <figure class="reveal">
-      <div class="figure-card">
-        <img src="Assets/model.png" width="4807" height="3455" loading="lazy"
-             alt="System overview: a specification-constrained task manager dispatches to a measurement expert and a manipulation expert, each behind a gate, over a shared inspection state, with a coverage audit feeding a conformance evaluator.">
-      </div>
-      <figcaption><b>Figure 1.</b> System overview. A specification-constrained task manager turns the observation, the operator instruction and the part specification into inspection subgoals, and dispatches them to a measurement expert &mdash; calibrated line profiles and the geometric quantities derived from them &mdash; and a manipulation expert that executes calibrated views and exposes the requested region. An admissibility gate and a correspondence gate let only verified evidence reach the shared inspection state, which keeps each measurement with its provenance alongside the physical-to-specification surface correspondence. A coverage audit closes the loop, and the conformance evaluator returns pass, no-pass, or unresolved.</figcaption>
+    <figure class="section-figure section-figure--dark reveal">
+      <img src="Assets/introduction.png" width="5880" height="4129" loading="lazy"
+           alt="From a high-mix part family and its specifications, through inspection programming and metrology, to visible, partially occluded and hidden features, task decomposition, and the dual-arm cell executing the inspection to a pass decision.">
     </figure>
+    <div class="section-body reveal">
+      <h2>Why Task-Specified Active Inspection?</h2>
+      <p>High-mix, low-volume manufacturing introduces frequent changes in parts, specifications, and inspection requests, making repeated inspection programming difficult to scale. Accurate sensing alone is insufficient: the system must also determine what to measure, actively expose hidden features, and verify that the required evidence is complete. FRAME addresses this challenge by transforming an instruction and structured specification into a closed-loop sequence of observation, scanning, and reorientation, followed by a deterministic, evidence-based conformance decision.</p>
+    </div>
+  </div>
+</section>
+
+<section class="method-section" id="method">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">How it works</p>
+    </div>
+    <figure class="section-figure reveal">
+      <img src="Assets/model.png" width="4807" height="3455" loading="lazy"
+           alt="System overview: a specification-constrained task manager dispatches to a measurement expert and a manipulation expert, each behind a gate, over a shared inspection state, with a coverage audit feeding a conformance evaluator.">
+    </figure>
+    <div class="section-body reveal">
+      <h2>Method Overview</h2>
+      <p>FRAME separates task reasoning, physical access, and metrological verification into explicit roles. A specification-constrained task manager translates the instruction and specification into inspection requirements, then coordinates two specialized experts. The manipulation expert observes and reorients the part to expose requested regions, while the measurement expert acquires calibrated line profiles and computes geometric quantities. Their outputs pass through correspondence and admissibility gates before entering a shared inspection state that records physical-to-specification correspondence, measurement provenance, and evidence coverage. If coverage is incomplete, the task manager continues the inspection loop; only complete, admissible evidence is passed to the deterministic conformance evaluator for the final report and sorting decision.</p>
+    </div>
   </div>
 </section>
 
@@ -432,7 +477,7 @@
     reveals.forEach(function (el) { io.observe(el); });
 
     var navLinks = document.querySelectorAll('nav.top .links a');
-    var sections = ['hero', 'video', 'figure', 'cite'].map(function (id) { return document.getElementById(id); });
+    var sections = ['hero', 'video', 'why', 'method', 'cite'].map(function (id) { return document.getElementById(id); });
     var spy = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {

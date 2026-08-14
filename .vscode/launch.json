@@ -1,0 +1,25 @@
+{
+  // https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Default. index.html is fully static — no fetch, no modules — so it
+      // opens straight off disk and needs nothing running.
+      "type": "chrome",
+      "request": "launch",
+      "name": "Open index.html",
+      "file": "${workspaceFolder}/index.html"
+    },
+    {
+      // Use this one if anything on the page ever needs a real origin
+      // (fetch, ES modules, service workers). Starts the server for you.
+      "type": "chrome",
+      "request": "launch",
+      "name": "Open via local server",
+      "url": "http://localhost:8765/index.html",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "serve",
+      "postDebugTask": "stop serve"
+    }
+  ]
+}

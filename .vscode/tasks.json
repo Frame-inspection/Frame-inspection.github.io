@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // Background task: VS Code has to be told how to recognise "the server
+      // is up" from the output, otherwise it waits for the process to exit
+      // and the launch never happens.
+      "label": "serve",
+      "type": "shell",
+      "command": "python3 -m http.server 8765",
+      "isBackground": true,
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "silent", "panel": "dedicated" },
+      "problemMatcher": {
+        "pattern": [{ "regexp": "^$", "file": 1, "location": 2, "message": 3 }],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Serving HTTP"
+        }
+      }
+    },
+    {
+      "label": "stop serve",
+      "type": "shell",
+      "command": "pkill -f 'http.server 8765' || true",
+      "presentation": { "reveal": "never" },
+      "problemMatcher": []
+    }
+  ]
+}
