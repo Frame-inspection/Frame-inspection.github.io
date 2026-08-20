@@ -1,0 +1,436 @@
+<mujoco model="xarm6 with camera stand and d435i">
+  <compiler angle="radian" autolimits="true" meshdir="assets"/>
+
+  <option integrator="implicitfast"/>
+
+  <asset>
+    <!-- Arm materials -->
+    <material name="white"        rgba="1 1 1 1"/>
+    <material name="gray"         rgba="0.753 0.753 0.753 1"/>
+    <material name="black"        rgba="0.149 0.149 0.149 1"/>
+    <!-- Camera stand: brushed aluminium -->
+    <material name="cam_stand_mat" rgba="0.72 0.72 0.74 1" specular="0.4" shininess="0.3"/>
+
+    <!-- xArm6 arm link meshes -->
+    <!-- XI1305/xArm6 meshes.  The previous links pointed to an xArm7 model. -->
+    <mesh name="link_base" file="link_base.stl"/>
+    <mesh name="link1" file="link1.stl"/>
+    <mesh name="link2" file="link2.stl"/>
+    <mesh name="link3" file="link3.stl"/>
+    <mesh name="link4" file="link4.stl"/>
+    <mesh name="link5" file="link5.stl"/>
+    <mesh name="link6" file="link6.stl"/>
+    <!-- Keep the scanner arm's established visual model and trajectory intact. -->
+    <mesh file="end_tool.stl"/>
+
+    <!-- Official xArm camera stand (combined bracket + D435i body, from xarm_ros) -->
+    <mesh file="d435_with_cam_stand.stl" name="d435_with_cam_stand"/>
+
+    <!-- Scanner bracket (STL in mm → scale to metres) -->
+    <mesh file="Bracket_Scanner.STL" name="bracket_scanner" scale="0.001 0.001 0.001"/>
+    <material name="bracket_mat" rgba="0.65 0.65 0.68 1" specular="0.3" shininess="0.2"/>
+
+    <!-- LJ-X8200 laser scanner (STL in mm → scale to metres) -->
+    <mesh file="LJ-X8200.stl" name="lj_x8200" scale="0.001 0.001 0.001"/>
+    <material name="lj_mat" rgba="0.15 0.15 0.15 1" specular="0.4" shininess="0.3"/>
+
+    <!-- xArm gripper meshes -->
+    <mesh file="base_link.stl"/>
+    <mesh file="left_outer_knuckle.stl"/>
+    <mesh file="left_finger.stl"/>
+    <mesh file="left_inner_knuckle.stl"/>
+    <mesh file="right_outer_knuckle.stl"/>
+    <mesh file="right_finger.stl"/>
+    <mesh file="right_inner_knuckle.stl"/>
+
+  </asset>
+
+  <default>
+    <default class="xarm6">
+      <geom type="mesh" material="white"/>
+      <joint axis="0 0 1" armature="0.1" range="-6.28319 6.28319" frictionloss="1"/>
+      <general biastype="affine" ctrlrange="-6.28319 6.28319"/>
+      <site size="0.001" rgba="1 0 0 1" group="4"/>
+
+      <default class="size1">
+        <joint damping="10"/>
+        <general gainprm="1500" biasprm="0 -1500 -150" forcerange="-50 50"/>
+      </default>
+      <default class="size2">
+        <joint damping="5"/>
+        <general gainprm="1000" biasprm="0 -1000 -100" forcerange="-30 30"/>
+      </default>
+      <default class="size3">
+        <joint damping="2"/>
+        <general gainprm="800" biasprm="0 -800 -80" forcerange="-20 20"/>
+      </default>
+
+      <!-- xArm gripper defaults -->
+      <default class="spring_link">
+        <joint range="0 0.85" stiffness="0.05" springref="2.62" damping="0.00125"/>
+      </default>
+      <default class="driver">
+        <joint range="0 0.85" armature="0.005" damping="0.1" solreflimit="0.005 1"/>
+      </default>
+      <default class="follower">
+        <joint range="0 0.85" solreflimit="0.005 1"/>
+      </default>
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2"/>
+      </default>
+      <default class="collision">
+        <geom type="mesh" group="3"/>
+        <default class="pad_box1">
+          <geom type="box" friction="0.7" solimp="0.95 0.99 0.001" solref="0.004 1"
+                mass="0" priority="1" size="0.015 0.002 0.0095" rgba="0.0 0.1 0.7 1"/>
+        </default>
+        <default class="pad_box2">
+          <geom type="box" friction="0.6" solimp="0.95 0.99 0.001" solref="0.004 1"
+                mass="0" priority="1" size="0.015 0.002 0.0095" rgba="0.0 0.5 0.5 1"/>
+        </default>
+      </default>
+    </default>
+
+  </default>
+
+  <!-- ═══════════════════════════════ BODIES ═══════════════════════════════ -->
+  <worldbody>
+    <body name="link_base" pos="0.4598 0.6044 0.80" euler="0 0 3.14159" childclass="xarm6">
+      <inertial pos="-0.021131 -0.0016302 0.056488"
+                quat="0.696843 0.20176 0.10388 0.680376"
+                mass="0.88556" diaginertia="0.00382023 0.00335282 0.00167725"/>
+      <geom mesh="link_base"/>
+
+      <!-- Per-robot kinematics read from controller XI1305. -->
+      <body name="link1"
+            pos="-0.000696381205 0.000171375170 0.265694022179"
+            quat="0.999998824999 -0.000664696125 -0.001381368591 0">
+        <inertial pos="-0.0002 0.02905 -0.01233"
+                  quat="0.978953 -0.202769 -0.00441617 -0.0227264"
+                  mass="2.382" diaginertia="0.00569127 0.00533384 0.00293865"/>
+        <joint name="joint1" range="-3.1101767 3.1101767" class="size1"/>
+        <geom mesh="link1"/>
+
+        <body name="link2"
+              pos="-0.000010618864 0.000000000020 -0.000000000013"
+              quat="0.707575955160 -0.706635945519 0.000976775090 0.000976775107">
+          <inertial pos="0.00022 -0.12856 0.01735"
+                    quat="0.50198 0.86483 -0.00778841 0.00483285"
+                    mass="1.869" diaginertia="0.00959898 0.00937717 0.00201315"/>
+          <joint name="joint2" range="-2.059 2.0944" class="size1"/>
+          <geom mesh="link2"/>
+
+          <body name="link3"
+                pos="0.052763167769 -0.284641653299 -0.000263647293"
+                quat="0.999999640000 -0.000567939171 -0.000630432451 0">
+            <inertial pos="0.0466 -0.02463 -0.00768"
+                      quat="0.913819 0.289775 0.281481 -0.0416455"
+                      mass="1.6383" diaginertia="0.00351721 0.00294089 0.00195868"/>
+            <joint name="joint3" range="-3.1101767 0.19198" class="size2"/>
+            <geom mesh="link3"/>
+
+            <body name="link4"
+                  pos="0.077932141721 0.341946393251 0.000388420187"
+                  quat="0.707508128228 -0.706704925019 0.000445783066 0.000445783056">
+              <inertial pos="0.07047 -0.11575 0.012"
+                        quat="0.422108 0.852026 -0.126025 0.282832"
+                        mass="1.7269" diaginertia="0.00657137 0.00647948 0.00186763"/>
+              <joint name="joint4" range="-3.1101767 3.1101767" class="size2"/>
+              <geom mesh="link4"/>
+
+              <body name="link5"
+                    pos="-0.000723999983 -0.000629000016 0"
+                    quat="0.707106765732 0.707106796641 0 0">
+                <inertial pos="-0.00032 0.01604 -0.026"
+                          quat="0.999311 -0.0304457 0.000577067 0.0212082"
+                          mass="1.3203" diaginertia="0.00534729 0.00499076 0.0013489"/>
+                <joint name="joint5" range="-1.69297 3.1101767" class="size2"/>
+                <geom mesh="link5"/>
+
+                <body name="link6"
+                      pos="0.076398000121 0.095196999609 0.000108000000"
+                      quat="0.707044552204 -0.707168997728 0.000083443326 -0.000053732770">
+                  <inertial pos="0.06469 0.03278 0.02141"
+                            quat="-0.217672 0.772419 0.16258 0.574069"
+                            mass="1.325" diaginertia="0.00245421 0.00221646 0.00107273"/>
+                  <joint name="joint6" range="-3.1101767 3.1101767" class="size3"/>
+                  <geom mesh="link6"/>
+
+                  <!-- link6 is the calibrated xArm6 flange frame. -->
+                  <body name="ee">
+                    <geom material="gray" mesh="end_tool"/>
+
+                    <!-- ══════════ Official xArm Camera Stand ══════════
+                         Bracket mesh origin (Z=0) sits flush on the flange face.
+                         The bracket arm extends in the +X direction of the ee frame;
+                         D435i is mounted at the far end of that arm.
+
+                         From xarm_ros realsense_d435i.urdf.xacro:
+                           camera_link_joint xyz="0.06746 -0.0175 0.0237"
+                                             rpy="π -π/2 0"
+
+                         Use the same camera_link frame as the xArm URDF:
+                         camera_link +X is optical forward, +Y is the imager
+                         baseline direction. MuJoCo cameras look along local -Z,
+                         so their frames are rotated to match the ROS optical frame.
+                    ══════════════════════════════════════════════════════ -->
+                    <body name="camera_stand">
+                      <!-- Combined mass: bracket ~80 g + D435i 72 g -->
+                      <inertial pos="0.034 -0.009 0.025" mass="0.152"
+                                diaginertia="1.5e-4 3e-4 3e-4"/>
+                      <!-- Visual-only bracket mesh (no collision) -->
+                      <geom name="cam_stand_geom" mesh="d435_with_cam_stand"
+                            material="cam_stand_mat"
+                            contype="0" conaffinity="0" group="2"/>
+
+                      <!-- D435i sensor-only body (no visual geoms — visual is already
+                           baked into the d435_with_cam_stand.stl mesh above).
+                           Position and axes from xarm_ros camera_link_joint. -->
+                      <body name="d435i" pos="0.06746 -0.0175 0.0237"
+                            xyaxes="0 0 1 0 -1 0">
+                        <inertial pos="0 0 -0.0125" mass="0.072"
+                                  diaginertia="5e-05 1e-04 1e-04"/>
+
+                        <!-- RGB camera: camera_color_frame xyz="0 0.015 0" -->
+                        <camera name="wrist_cam_color" pos="0 0.015 0"
+                                xyaxes="0 -1 0 0 0 1" fovy="43.486482"/>
+                        <!-- Depth camera: camera_depth_frame at camera_link -->
+                        <camera name="wrist_cam_depth" pos="0 0 0"
+                                xyaxes="0 -1 0 0 0 1" fovy="57"/>
+
+                        <!-- IMU site -->
+                        <site name="d435i_imu" pos="0 0 -0.013" size="0.003"
+                              rgba="0 1 1 1" group="4"/>
+                      </body>
+
+                      <!-- Approximate camera optical-centre TCP -->
+                      <site name="cam_tcp" pos="0.06746 -0.0175 0.0237"
+                            size="0.005" rgba="1 0.5 0 1" group="4"/>
+                    </body>
+                    <!-- ════════════ xArm Gripper ════════════ -->
+                    <body name="xarm_gripper_base_link">
+                      <inertial pos="-0.00065489 -0.0018497 0.048028"
+                                quat="0.997403 -0.0717512 -0.0061836 0.000477479"
+                                mass="0.54156" diaginertia="0.000471093 0.000332307 0.000254799"/>
+                      <geom mesh="base_link" material="white"/>
+
+                      <body name="left_outer_knuckle" pos="0 0.035 0.059098">
+                        <inertial pos="0 0.021559 0.015181"
+                                  quat="0.47789 0.87842 0 0"
+                                  mass="0.033618" diaginertia="1.9111e-05 1.79089e-05 1.90167e-06"/>
+                        <joint name="left_driver_joint" axis="1 0 0" class="driver"/>
+                        <geom material="black" mesh="left_outer_knuckle"/>
+                        <body name="left_finger" pos="0 0.035465 0.042039">
+                          <inertial pos="0 -0.016413 0.029258"
+                                    quat="0.697634 0.115353 -0.115353 0.697634"
+                                    mass="0.048304" diaginertia="1.88037e-05 1.7493e-05 3.56792e-06"/>
+                          <joint name="left_finger_joint" axis="-1 0 0" class="follower"/>
+                          <geom class="visual" material="black" mesh="left_finger"/>
+                          <geom class="pad_box1" name="left_finger_pad1" pos="0 -0.024003 0.032"/>
+                          <geom class="pad_box2" name="left_finger_pad2" pos="0 -0.024003 0.050"/>
+                        </body>
+                      </body>
+
+                      <body name="left_inner_knuckle" pos="0 0.02 0.074098">
+                        <inertial pos="1.86601e-06 0.0220468 0.0261335"
+                                  quat="0.664139 -0.242732 0.242713 0.664146"
+                                  mass="0.0230126" diaginertia="8.34216e-06 6.0949e-06 2.75601e-06"/>
+                        <joint name="left_inner_knuckle_joint" axis="1 0 0" class="spring_link"/>
+                        <geom material="black" mesh="left_inner_knuckle"/>
+                      </body>
+
+                      <body name="right_outer_knuckle" pos="0 -0.035 0.059098">
+                        <inertial pos="0 -0.021559 0.015181"
+                                  quat="0.87842 0.47789 0 0"
+                                  mass="0.033618" diaginertia="1.9111e-05 1.79089e-05 1.90167e-06"/>
+                        <joint name="right_driver_joint" axis="-1 0 0" class="driver"/>
+                        <geom material="black" mesh="right_outer_knuckle"/>
+                        <body name="right_finger" pos="0 -0.035465 0.042039">
+                          <inertial pos="0 0.016413 0.029258"
+                                    quat="0.697634 -0.115356 0.115356 0.697634"
+                                    mass="0.048304" diaginertia="1.88038e-05 1.7493e-05 3.56779e-06"/>
+                          <joint name="right_finger_joint" axis="1 0 0" class="follower"/>
+                          <geom class="visual" material="black" mesh="right_finger"/>
+                          <geom class="pad_box1" name="right_finger_pad1" pos="0 0.024003 0.032"/>
+                          <geom class="pad_box2" name="right_finger_pad2" pos="0 0.024003 0.050"/>
+                        </body>
+                      </body>
+
+                      <body name="right_inner_knuckle" pos="0 -0.02 0.074098">
+                        <inertial pos="1.866e-06 -0.022047 0.026133"
+                                  quat="0.66415 0.242702 -0.242721 0.664144"
+                                  mass="0.023013" diaginertia="8.34209e-06 6.0949e-06 2.75601e-06"/>
+                        <joint name="right_inner_knuckle_joint" axis="-1 0 0" class="spring_link"/>
+                        <geom material="black" mesh="right_inner_knuckle"/>
+                      </body>
+
+                      <site name="gripper_tcp" pos="0 0 0.172" size="0.005" rgba="1 0 0 1" group="4"/>
+                    </body>
+                    <!-- ═════════════════════════════════════════════════ -->
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- ════════════════ Second arm (bare, no gripper / camera) ════════════ -->
+    <body name="arm2_link_base" pos="0.4598 1.1994 0.80" euler="0 0 3.14159" childclass="xarm6">
+      <inertial pos="-0.021131 -0.0016302 0.056488"
+                quat="0.696843 0.20176 0.10388 0.680376"
+                mass="0.88556" diaginertia="0.00382023 0.00335282 0.00167725"/>
+      <geom mesh="link_base"/>
+
+      <!-- Same calibrated chain as arm 1 (controller XI1305).  The previous
+           nominal-menagerie chain split the joint frames differently, which
+           put arm2_joint4/6 on the real robot's J3/J5 and threw the flange
+           247 mm off at non-trivial poses.  Swap in this arm's own kinematics
+           dump when it is available. -->
+      <body name="arm2_link1"
+            pos="-0.000696381205 0.000171375170 0.265694022179"
+            quat="0.999998824999 -0.000664696125 -0.001381368591 0">
+        <inertial pos="-0.0002 0.02905 -0.01233"
+                  quat="0.978953 -0.202769 -0.00441617 -0.0227264"
+                  mass="2.382" diaginertia="0.00569127 0.00533384 0.00293865"/>
+        <joint name="arm2_joint1" range="-3.1101767 3.1101767" class="size1"/>
+        <geom mesh="link1"/>
+
+        <body name="arm2_link2"
+              pos="-0.000010618864 0.000000000020 -0.000000000013"
+              quat="0.707575955160 -0.706635945519 0.000976775090 0.000976775107">
+          <inertial pos="0.00022 -0.12856 0.01735"
+                    quat="0.50198 0.86483 -0.00778841 0.00483285"
+                    mass="1.869" diaginertia="0.00959898 0.00937717 0.00201315"/>
+          <joint name="arm2_joint2" range="-2.059 2.0944" class="size1"/>
+          <geom mesh="link2"/>
+
+          <body name="arm2_link3"
+                pos="0.052763167769 -0.284641653299 -0.000263647293"
+                quat="0.999999640000 -0.000567939171 -0.000630432451 0">
+            <inertial pos="0.0466 -0.02463 -0.00768"
+                      quat="0.913819 0.289775 0.281481 -0.0416455"
+                      mass="1.6383" diaginertia="0.00351721 0.00294089 0.00195868"/>
+            <joint name="arm2_joint3" range="-3.1101767 0.19198" class="size2"/>
+            <geom mesh="link3"/>
+
+            <body name="arm2_link4"
+                  pos="0.077932141721 0.341946393251 0.000388420187"
+                  quat="0.707508128228 -0.706704925019 0.000445783066 0.000445783056">
+              <inertial pos="0.07047 -0.11575 0.012"
+                        quat="0.422108 0.852026 -0.126025 0.282832"
+                        mass="1.7269" diaginertia="0.00657137 0.00647948 0.00186763"/>
+              <joint name="arm2_joint4" range="-3.1101767 3.1101767" class="size2"/>
+              <geom mesh="link4"/>
+
+              <body name="arm2_link5"
+                    pos="-0.000723999983 -0.000629000016 0"
+                    quat="0.707106765732 0.707106796641 0 0">
+                <inertial pos="-0.00032 0.01604 -0.026"
+                          quat="0.999311 -0.0304457 0.000577067 0.0212082"
+                          mass="1.3203" diaginertia="0.00534729 0.00499076 0.0013489"/>
+                <joint name="arm2_joint5" range="-1.69297 3.1101767" class="size2"/>
+                <geom mesh="link5"/>
+
+                <body name="arm2_link6"
+                      pos="0.076398000121 0.095196999609 0.000108000000"
+                      quat="0.707044552204 -0.707168997728 0.000083443326 -0.000053732770">
+                  <inertial pos="0.06469 0.03278 0.02141"
+                            quat="-0.217672 0.772419 0.16258 0.574069"
+                            mass="1.325" diaginertia="0.00245421 0.00221646 0.00107273"/>
+                  <joint name="arm2_joint6" range="-3.1101767 3.1101767" class="size3"/>
+                  <geom mesh="link6"/>
+
+                  <!-- arm2_link6 is the calibrated flange frame, as on arm 1,
+                       so the scanner bracket hangs off it with no extra offset. -->
+                  <body name="arm2_ee">
+                    <geom material="gray" mesh="end_tool"/>
+                    <body name="bracket_scanner" pos="0.00 0.00 0.00" euler="0 0 -1.5708">
+                      <inertial pos="0 0 0.030" mass="0.15"
+                                diaginertia="1e-4 2e-4 1e-4"/>
+                      <!-- Mesh origin at corner; shift -X/2 and -Y/2 to centre on flange -->
+                      <geom name="bracket_scanner_geom" mesh="bracket_scanner"
+                            material="bracket_mat"
+                            pos="0.094 -0.04 0.060"
+                            euler="0 3.14159 0"
+                            contype="0" conaffinity="0" group="2"/>
+                      <body name="lj_scanner" pos="0 0 0">
+                        <inertial pos="0 0 0" mass="0.6"
+                                  diaginertia="1e-3 3e-3 3e-3"/>
+                        <!-- Align the LJ-X8200 upper three mounting holes to the
+                             bracket hole pattern, with the scanner flipped to the
+                             outside of the bracket. -->
+                        <geom name="lj_scanner_geom" mesh="lj_x8200"
+                              material="lj_mat"
+                              pos="0.049 0.081 0.168"
+                              quat="0.5 -0.5 0.5 -0.5"
+                              contype="0" conaffinity="0" group="2"/>
+                      </body>
+                    </body>
+                    <site name="arm2_tcp" pos="0 0 0.172" size="0.005" rgba="0 1 0 1" group="4"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+  </worldbody>
+
+  <!-- ═══════════════════════════════ CONSTRAINTS ══════════════════════════ -->
+  <contact>
+    <exclude body1="right_inner_knuckle" body2="right_outer_knuckle"/>
+    <exclude body1="right_inner_knuckle" body2="right_finger"/>
+    <exclude body1="left_inner_knuckle"  body2="left_outer_knuckle"/>
+    <exclude body1="left_inner_knuckle"  body2="left_finger"/>
+    <exclude body1="left_inner_knuckle"  body2="xarm_gripper_base_link"/>
+    <exclude body1="right_inner_knuckle" body2="xarm_gripper_base_link"/>
+    <exclude body1="left_outer_knuckle"  body2="xarm_gripper_base_link"/>
+    <exclude body1="right_outer_knuckle" body2="xarm_gripper_base_link"/>
+    <exclude body1="camera_stand"        body2="xarm_gripper_base_link"/>
+    <exclude body1="d435i"               body2="xarm_gripper_base_link"/>
+  </contact>
+
+  <tendon>
+    <fixed name="gripper_split">
+      <joint joint="right_driver_joint" coef="0.5"/>
+      <joint joint="left_driver_joint"  coef="0.5"/>
+    </fixed>
+  </tendon>
+
+  <equality>
+    <connect anchor="0  0.015 0.015" body1="right_finger" body2="right_inner_knuckle" solref="0.005 1"/>
+    <connect anchor="0 -0.015 0.015" body1="left_finger"  body2="left_inner_knuckle"  solref="0.005 1"/>
+    <joint joint1="left_driver_joint" joint2="right_driver_joint" polycoef="0 1 0 0 0" solref="0.005 1"/>
+  </equality>
+
+  <!-- ═══════════════════════════════ SENSORS ═══════════════════════════ -->
+  <sensor>
+    <accelerometer name="d435i_accel" site="d435i_imu"/>
+    <gyro          name="d435i_gyro"  site="d435i_imu"/>
+  </sensor>
+
+  <!-- ═══════════════════════════ ACTUATORS ════════════════════════════ -->
+  <actuator>
+    <general name="act1" joint="joint1" class="size1" ctrlrange="-3.1101767 3.1101767"/>
+    <general name="act2" joint="joint2" class="size1" ctrlrange="-2.059 2.0944"/>
+    <general name="act3" joint="joint3" class="size2" ctrlrange="-3.1101767 0.19198"/>
+    <general name="act4" joint="joint4" class="size2" ctrlrange="-3.1101767 3.1101767"/>
+    <general name="act5" joint="joint5" class="size2" ctrlrange="-1.69297 3.1101767"/>
+    <general name="act6" joint="joint6" class="size3" ctrlrange="-3.1101767 3.1101767"/>
+    <general name="gripper" tendon="gripper_split"
+             biastype="affine" forcerange="-50 50"
+             ctrlrange="0 255" gainprm="0.333" biasprm="0 -100 -10"/>
+    <!-- Second arm -->
+    <general name="arm2_act1" joint="arm2_joint1" class="size1" ctrlrange="-3.1101767 3.1101767"/>
+    <general name="arm2_act2" joint="arm2_joint2" class="size1" ctrlrange="-2.059 2.0944"/>
+    <general name="arm2_act3" joint="arm2_joint3" class="size2" ctrlrange="-3.1101767 0.19198"/>
+    <general name="arm2_act4" joint="arm2_joint4" class="size2" ctrlrange="-3.1101767 3.1101767"/>
+    <general name="arm2_act5" joint="arm2_joint5" class="size2" ctrlrange="-1.69297 3.1101767"/>
+    <general name="arm2_act6" joint="arm2_joint6" class="size3" ctrlrange="-3.1101767 3.1101767"/>
+  </actuator>
+
+</mujoco>

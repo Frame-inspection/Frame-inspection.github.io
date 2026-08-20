@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FRAME Demo · Interactive Robot Lab</title>
+    <meta
+      name="description"
+      content="Replay dual-arm manipulation skills and laser line scans on real MuJoCo physics, in the browser."
+    />
+    <link rel="icon" href="./assets/favicon-B13FBozU.svg" />
+    <!-- next/font is a build step the static export does not have, so the two
+         faces globals.css asks for are linked instead. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap"
+    />
+    <script type="module" crossorigin src="./assets/index-DE8iA-B1.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BbSvPV6s.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Opened from disk this page is blank: a file: origin blocks the module
+         script outright, and MuJoCo's scenes and meshes are fetched, which is
+         blocked too. Nothing can rescue that, so say so - this script is
+         inline and classic, the one kind file: still runs. -->
+    <script>
+      if (location.protocol === "file:") {
+        document.getElementById("root").innerHTML =
+          '<div style="font:16px/1.6 -apple-system,system-ui,sans-serif;color:#eef5f2;'
+          + 'max-width:34em;margin:14vh auto;padding:0 6vw">'
+          + '<p style="color:#75f2c4;letter-spacing:.14em;font-size:12px;margin:0 0 18px">'
+          + 'NEEDS A WEB SERVER</p>'
+          + '<h1 style="font-size:26px;font-weight:600;margin:0 0 18px">'
+          + 'This demo cannot run from a file on disk.</h1>'
+          + '<p style="margin:0 0 14px;color:rgba(226,238,233,.7)">It loads MuJoCo as a'
+          + ' WebAssembly module and fetches its scenes, meshes and recorded skills at'
+          + ' runtime. Browsers block both over <code>file://</code>.</p>'
+          + '<p style="margin:0 0 10px;color:rgba(226,238,233,.7)">Serve the site instead,'
+          + ' from the folder holding the paper page:</p>'
+          + '<pre style="background:rgba(224,244,236,.07);border:1px solid rgba(224,244,236,.12);'
+          + 'border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;margin:0 0 14px">'
+          + 'python3 -m http.server 8000</pre>'
+          + '<p style="margin:0;color:rgba(226,238,233,.7)">Then open '
+          + '<code style="color:#75f2c4">http://localhost:8000/demo/</code>. Once the site is'
+          + ' published on GitHub Pages it is served over HTTP and just works.</p>'
+          + '</div>';
+        document.body.style.background = "#07100e";
+      }
+    </script>
+  </body>
+</html>

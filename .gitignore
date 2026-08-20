@@ -1,5 +1,6 @@
 Simulation/
 .claude/
+.DS_Store
 
 # Original camera master (217 MiB, over GitHub's 100 MiB file limit).
 # The committed Assets/video.mp4 is the H.264 web encode of this file.

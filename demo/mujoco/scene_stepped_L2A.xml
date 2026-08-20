@@ -1,0 +1,158 @@
+<mujoco model="xarm6 camstand stepped_L2A">
+
+  <include file="xarm6_with_camstand.xml"/>
+
+  <statistic center="0.2 0.6 1.0" extent="1.4"/>
+
+  <visual>
+    <headlight diffuse="0.3 0.3 0.2" ambient="0.14 0.14 0.13" specular="0.06 0.06 0.06"/>
+    <rgba haze="0.08 0.08 0.075 1"/>
+    <global azimuth="160" elevation="-20"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient"
+             rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge"
+             rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+             markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane"  texture="groundplane" texuniform="true"
+              texrepeat="5 5" reflectance="0.2"/>
+    <material name="table_top" rgba="0.015 0.015 0.014 1"
+              specular="0.25" shininess="0.35"/>
+    <material name="m6_hole_mat" rgba="0 0 0 1"
+              specular="0.03" shininess="0.1"/>
+    <material name="table_frame"  rgba="0.40 0.30 0.20 1"/>
+    <material name="mount_plate"  rgba="0.55 0.55 0.60 1"/>
+    <material name="scan_region_mat" rgba="1 0 0 1" emission="0.15"/>
+    <material name="scan_region_green_mat" rgba="0 1 0 1" emission="0.08"/>
+    <material name="scan_region_blue_mat" rgba="0.02 0.24 0.78 1" emission="0.06"/>
+    <material name="object_mat"   rgba="0.9 0.4 0.1 1"/>
+    <mesh name="part_mesh" file="parts/stepped_L2A.stl" inertia="exact"/>
+  </asset>
+
+  <worldbody>
+    <!-- Lab-like lighting: warm overhead spots, a strong left task lamp,
+         and a cooler small fill light near the scanner stand. -->
+    <light name="ceiling_spot_left" pos="-0.45 0.45 2.65" dir="0.20 0.35 -1"
+           directional="false" cutoff="46" exponent="6"
+           diffuse="1.21 1.08 0.81" specular="0.25 0.23 0.18"/>
+    <light name="ceiling_spot_right" pos="0.65 1.50 2.55" dir="-0.25 -0.25 -1"
+           directional="false" cutoff="42" exponent="7"
+           diffuse="0.86 0.78 0.60" specular="0.21 0.18 0.14"/>
+    <light name="left_task_lamp" pos="-0.85 0.35 1.35" dir="0.85 0.35 -0.45"
+           directional="false" cutoff="34" exponent="12"
+           diffuse="2.24 1.86 1.21" specular="0.98 0.83 0.58"/>
+    <light name="right_cool_fill" pos="0.95 1.35 1.45" dir="-0.55 -0.45 -0.55"
+           directional="false" cutoff="34" exponent="12"
+           diffuse="0.41 0.53 0.71" specular="0.48 0.58 0.78"/>
+
+    <geom name="floor" size="0 0 0.05" pos="0 0.9144 0" type="plane" material="groundplane"/>
+
+    <!-- Optical table sized for a 45 x 69 M6 grid at 25 mm pitch with
+         4.8 mm edge offset. The visible hole geoms omit the outer edge
+         rows/columns, leaving a 43 x 67 grid. Surface at Z=0.800 m. -->
+    <body name="table" pos="0 0.9144 0">
+      <geom name="table_top"
+            type="box" size="0.5548 0.8548 0.025"
+            pos="0 0 0.775" material="table_top"/>
+      <include file="m6_holes.xml"/>
+      <!-- Each opening encloses exactly 2 x 4 holes on the 25 mm-pitch M6
+           grid. The 10 mm-wide border covers the surrounding ring of holes. -->
+      <body name="scan_region" pos="0.0625 0.0875 0.801">
+        <geom name="scan_region_front" type="box" size="0.0425 0.005 0.0006"
+              pos="0 -0.0625 0" material="scan_region_mat"
+              contype="0" conaffinity="0" group="2"/>
+        <geom name="scan_region_back" type="box" size="0.0425 0.005 0.0006"
+              pos="0 0.0625 0" material="scan_region_mat"
+              contype="0" conaffinity="0" group="2"/>
+        <geom name="scan_region_left" type="box" size="0.005 0.0625 0.0006"
+              pos="-0.0375 0 0" material="scan_region_mat"
+              contype="0" conaffinity="0" group="2"/>
+        <geom name="scan_region_right" type="box" size="0.005 0.0625 0.0006"
+              pos="0.0375 0 0" material="scan_region_mat"
+              contype="0" conaffinity="0" group="2"/>
+      </body>
+      <body name="scan_region_green" pos="0.0625 -0.1125 0.801">
+        <geom name="scan_region_green_front" type="box" size="0.0425 0.005 0.0006"
+              pos="0 -0.0625 0" material="scan_region_green_mat"
+              contype="0" conaffinity="0" group="2"/>
+        <geom name="scan_region_green_back" type="box" size="0.0425 0.005 0.0006"
+              pos="0 0.0625 0" material="scan_region_green_mat"
+              contype="0" conaffinity="0" group="2"/>
+        <geom name="scan_region_green_left" type="box" size="0.005 0.0625 0.0006"
+              pos="-0.0375 0 0" material="scan_region_green_mat"
+              contype="0" conaffinity="0" group="2"/>
+        <geom name="scan_region_green_right" type="box" size="0.005 0.0625 0.0006"
+              pos="0.0375 0 0" material="scan_region_green_mat"
+              contype="0" conaffinity="0" group="2"/>
+      </body>
+      <body name="scan_region_blue" pos="0.1875 -0.0125 0.801">
+        <geom name="scan_region_blue_front" type="box" size="0.0425 0.005 0.0006"
+              pos="0 -0.0625 0" material="scan_region_blue_mat"
+              contype="0" conaffinity="0" group="2"/>
+        <geom name="scan_region_blue_back" type="box" size="0.0425 0.005 0.0006"
+              pos="0 0.0625 0" material="scan_region_blue_mat"
+              contype="0" conaffinity="0" group="2"/>
+        <geom name="scan_region_blue_left" type="box" size="0.005 0.0625 0.0006"
+              pos="-0.0375 0 0" material="scan_region_blue_mat"
+              contype="0" conaffinity="0" group="2"/>
+        <geom name="scan_region_blue_right" type="box" size="0.005 0.0625 0.0006"
+              pos="0.0375 0 0" material="scan_region_blue_mat"
+              contype="0" conaffinity="0" group="2"/>
+      </body>
+      <geom name="leg_fl" type="cylinder" size="0.025 0.3685"
+            pos=" 0.525  0.825 0.3685" material="table_frame"/>
+      <geom name="leg_fr" type="cylinder" size="0.025 0.3685"
+            pos="-0.525  0.825 0.3685" material="table_frame"/>
+      <geom name="leg_bl" type="cylinder" size="0.025 0.3685"
+            pos=" 0.525 -0.825 0.3685" material="table_frame"/>
+      <geom name="leg_br" type="cylinder" size="0.025 0.3685"
+            pos="-0.525 -0.825 0.3685" material="table_frame"/>
+      <!-- Arm 1 mount plate — right edge, +310 mm from table Y-centre -->
+      <geom name="arm_mount"
+            type="box" size="0.07 0.09 0.0025"
+            pos="0.4598 -0.310 0.805" material="mount_plate"/>
+      <geom name="arm2_mount"
+            type="box" size="0.07 0.09 0.0025"
+            pos="0.4598 0.285 0.805" material="mount_plate"/>
+    </body>
+
+    <!-- stepped_L2A: meshed from parts/L2/stepped_L2A.step,
+         recentred in X/Y with its bottom face at z=0. -->
+    <body name="test_part" pos="0.1875 0.9019 0.8005">
+      <freejoint/>
+      <geom name="part_geom" type="mesh" mesh="part_mesh" density="800"
+            material="object_mat" friction="0.8 0.1 0.1" solref="0.004 1" solimp="0.95 0.99 0.001"/>
+    </body>
+
+    <camera name="front_view"
+            pos="0.0 -0.8 1.6"
+            xyaxes="1 0 0 0 0.5 0.866"/>
+    <camera name="side_view"
+            pos="1.8 0.9 1.4"
+            xyaxes="0 1 0 -0.45 0 0.89"/>
+    <camera name="top_view"
+            pos="0.0 0.8 2.5"
+            xyaxes="1 0 0 0 1 0"/>
+  </worldbody>
+
+  <!--
+    qpos layout: 6 arm1 | 6 gripper | 6 arm2 | 7 part freejoint
+    nq = 25,  nu = 13 (6 arm1 + 1 gripper + 6 arm2)
+  -->
+  <!--
+    Both arms now run the same calibrated (XI1305) chain, so sharing joint
+    values puts the scanner flange at the same place in its own base frame as
+    the gripper flange is in arm 1's: (209.0, -59.2, 161.3) mm.
+  -->
+  <keyframe>
+    <key name="home"
+         qpos="0 -0.247 0 0.909 0 1.15644  0 0 0  0 0 0  0 -0.247 0 0.909 0 1.15644  0.1875 0.9019 0.8005 1 0 0 0"
+         ctrl="0 -0.247 0 0.909 0 1.15644  0  0 -0.247 0 0.909 0 1.15644"/>
+    <key name="gripper_closed"
+         qpos="0 -0.247 0 0.909 0 1.15644  0.85 0.85 2.62  0.85 0.85 2.62  0 -0.247 0 0.909 0 1.15644  0.1875 0.9019 0.8005 1 0 0 0"
+         ctrl="0 -0.247 0 0.909 0 1.15644  255  0 -0.247 0 0.909 0 1.15644"/>
+  </keyframe>
+
+</mujoco>
